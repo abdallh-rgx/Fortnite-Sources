@@ -16,6 +16,7 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y p7zip-full unzip python3 python3-pip curl ttyd
+          sudo systemctl stop ttyd || true
 
       - name: Extract 7z and CppSDK Zip Archives
         run: |
@@ -51,7 +52,8 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          ttyd -p 7681 -W bash &
+          ttyd -p 7682 -W bash &
+          sleep 2
           gh release download --repo cloudflare/cloudflared -p "cloudflared-linux-amd64.deb"
           sudo dpkg -i cloudflared-linux-amd64.deb
-          cloudflared tunnel --url http://localhost:7681
+          cloudflared tunnel --url http://localhost:7682
