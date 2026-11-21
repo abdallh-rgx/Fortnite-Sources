@@ -15,7 +15,7 @@ jobs:
       - name: Install Required Tools
         run: |
           sudo apt-get update
-          sudo apt-get install -y p7zip-full unzip python3 python3-pip curl
+          sudo apt-get install -y p7zip-full unzip python3 python3-pip curl ttyd
 
       - name: Extract 7z and CppSDK Zip Archives
         run: |
@@ -48,10 +48,10 @@ jobs:
             revng/revng:latest tail -f /dev/null
 
       - name: Start Web Terminal and Cloudflared Tunnel
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
-          curl -L https://github.com -o ttyd
-          chmod +x ttyd
-          ./ttyd -p 7681 -W bash &
-          curl -L --output cloudflared.deb https://github.com
-          sudo dpkg -i cloudflared.deb
+          ttyd -p 7681 -W bash &
+          gh release download --repo cloudflare/cloudflared -p "cloudflared-linux-amd64.deb"
+          sudo dpkg -i cloudflared-linux-amd64.deb
           cloudflared tunnel --url http://localhost:7681
